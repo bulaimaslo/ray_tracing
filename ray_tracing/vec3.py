@@ -16,6 +16,9 @@ class Vec3:
     def length(self):
         return math.sqrt(self.e[0] ** 2 + self.e[1] ** 2 + self.e[2] ** 2)
 
+    def length_squared(self):
+        return self.e[0] ** 2 + self.e[1] ** 2 + self.e[2] ** 2
+
     def __add__(self, other):
         return Vec3(self.e[0] + other.x(), self.e[1] + other.y(), self.e[2] + other.z())
 
