@@ -9,8 +9,31 @@ class Vec3:
 
     def y(self):
         return self.e[1]
-    
+
     def z(self):
         return self.e[2]
 
+    def length(self):
+        return math.sqrt(self.e[0] ** 2 + self.e[1] ** 2 + self.e[2] ** 2)
+
+    def __add__(self, other):
+        return Vec3(self.e[0] + other.x(), self.e[1] + other.y(), self.e[2] + other.z())
+
+    def __sub__(self, other):
+        return Vec3(self.e[0] - other.x(), self.e[1] - other.y(), self.e[2] - other.z())
+
+    def __mul__(self, t):
+        if isinstance(t, Vec3):
+            return Vec3(self.e[0] * t.x(), self.e[1] * t.y(), self.e[2] * t.z())
+        return Vec3(self.e[0] * t, self.e[1] * t, self.e[2] * t)
     
+    def __rmul__(self, t):
+        return self * t
+
+    def __truediv__(self, t):
+        return self * (1/t)
+
+
+def unit_vector(v):
+    return v / v.length()
+
