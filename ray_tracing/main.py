@@ -1,9 +1,21 @@
 import sys
-from vec3 import Vec3, unit_vector
+from vec3 import Vec3, unit_vector, dot
 from color import write_color
 from ray import Ray
 
+def hit_sphere(center, radius, ray):
+    oc = center - ray.origin
+    a = dot(ray.direction, ray.direction)
+    b = -2 * dot(ray.direction, oc)
+    c = dot(oc, oc)  - radius**2
+    discriminant = b*b - 4*a*c
+
+    return discriminant >= 0
+
 def ray_color(r: Ray):
+    if hit_sphere(Vec3(0,0,-1), 0.5, r):
+        return Vec3(1,0,0)
+
     # blendedValue=(1−a)*startValue+a*endValue where 0<=a<=1
     unit_direction = unit_vector(r.direction)
     a = 0.5 * (unit_direction.y() + 1.0)

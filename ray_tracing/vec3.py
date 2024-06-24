@@ -34,6 +34,9 @@ class Vec3:
         return self * (1/t)
 
 
+def dot(v, t):
+        return v.x() * t.x() + v.y() * t.y() + v.z() * t.z() 
+
 def unit_vector(v):
     return v / v.length()
 
