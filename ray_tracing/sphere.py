@@ -9,7 +9,7 @@ class Sphere(Hittable):
         self.center = center
         self.radius = max(0, radius)
 
-    def hit(self, ray, t_min, t_max, rec):
+    def hit(self, ray, ray_t, rec):
         oc = ray.origin - self.center
         a = ray.direction.length() ** 2
         half_b = dot(oc, ray.direction)
@@ -23,13 +23,16 @@ class Sphere(Hittable):
 
         #Find the nearest root that lies in the acceptable range.
         root = (-half_b - sqrtd) / a
-        if root < t_min or t_max < root:
+        if root < ray_t.low or ray_t.high < root:
             root = (-half_b + sqrtd) / a
-            if root < t_min or t_max < root:
+            if root < ray_t.low or ray_t.high < root:
                 return False
 
         rec.t = root
         rec.p = ray.at(rec.t)
-        rec.normal_v = (rec.p - self.center) / self.radius
+        rec.normal = (rec.p - self.center) / self.radius
 
+        outward_normal = (rec.p - self.center) / self.radius
+        rec.set_face_normal(ray, outward_normal)
+        
         return True

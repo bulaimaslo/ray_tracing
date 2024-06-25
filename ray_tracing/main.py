@@ -1,45 +1,25 @@
 import sys
-from hittable import Hittable
 from vec3 import Vec3, unit_vector
 from ray import Ray
 from color import write_color
 from sphere import Sphere
+from hittable_list import HittableList
 from hit_record import HitRecord
+from interval import Interval
 
 def ray_color(ray, world):
     rec = HitRecord()
-    if world.hit(ray, 0.001, float('inf'), rec):
-        return 0.5 * (rec.normal_v + Vec3(1, 1, 1))
+    if world.hit(ray, Interval(0.001, float('inf')), rec):
+        return 0.5 * (rec.normal + Vec3(1, 1, 1))
     unit_direction = unit_vector(ray.direction)
     t = 0.5 * (unit_direction.y() + 1.0)
     return (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0)
 
-class HittableList(Hittable):
-    def __init__(self):
-        self.objects = []
-
-    def add(self, obj):
-        self.objects.append(obj)
-
-    def hit(self, ray, t_min, t_max, rec):
-        temp_rec = HitRecord()
-        hit_anything = False
-        closest_so_far = t_max
-
-        for obj in self.objects:
-            if obj.hit(ray, t_min, closest_so_far, temp_rec):
-                hit_anything = True
-                closest_so_far = temp_rec.t
-                rec.t = temp_rec.t
-                rec.p = temp_rec.p
-                rec.normal_v = temp_rec.normal_v
-
-        return hit_anything
-
 def main():
-    aspect_ratio = 16.0 / 9
+    aspect_ratio = 16.0 / 9.0
     image_width = 400
     image_height = int(image_width / aspect_ratio)
+    image_height = max(1, image_height)
 
     # World
     world = HittableList()
@@ -73,4 +53,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
