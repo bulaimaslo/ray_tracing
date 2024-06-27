@@ -27,12 +27,12 @@ class Camera:
         self.pixel_delta_v = self.vertical / self.image_height
         self.pixel00_loc = self.lower_left_corner + 0.5 * (self.pixel_delta_u + self.pixel_delta_v)
         self.px_samples_scale = 1.0 / self.samples_per_px 
-    
+
     def sample_square(self):
         return Vec3(random.random() - 0.5, random.random() - 0.5, 0)
-    
-    # Construct a camera ray originating from origing and directed at 
-    #randomly sampled point around the px location i,j
+
+    # Construct a camera ray originating from origin and directed at 
+    # randomly sampled point around the px location i,j
     def get_ray(self, i, j):
         offset = self.sample_square()
         pixel_sample = self.pixel00_loc + ((i + offset.x()) * self.pixel_delta_u) + ((j + offset.y()) * self.pixel_delta_v)
@@ -41,16 +41,24 @@ class Camera:
         
         return Ray(ray_origin, ray_direction)
 
-    def ray_color(self, ray, world):
+    def ray_color(self, ray, world, depth):
         rec = HitRecord()
-        if world.hit(ray, Interval(0, float('inf')), rec):
-            return 0.5 * (rec.normal + Vec3(1, 1, 1))
+        if depth <= 0:
+            return Vec3(0, 0, 0)  # break recursiion
+
+        if world.hit(ray, Interval(0.001, float('inf')), rec):  # prevent shadow acne
+            # target = rec.p + Vec3.random_on_hemisphere(rec.normal)
+            direction = rec.normal + Vec3.random_unit_vector()
+            return 0.5 * self.ray_color(Ray(rec.p, direction), world, depth - 1)
+
         unit_direction = unit_vector(ray.direction)
         t = 0.5 * (unit_direction.y() + 1.0)
         return (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0)
 
     def render(self, world):
         sys.stdout.write(f"P3\n{self.image_width} {self.image_height}\n255\n")
+
+        max_depth = 50
 
         for j in range(self.image_height - 1, -1, -1):
             sys.stderr.write(f"\rScanlines remaining: {j} ")
@@ -59,7 +67,7 @@ class Camera:
                 pixel_color = Vec3(0, 0, 0)
                 for _ in range(self.samples_per_px):
                     ray = self.get_ray(i, j)
-                    pixel_color +=  self.ray_color(ray, world)
+                    pixel_color += self.ray_color(ray, world, max_depth)
                 pixel_color *= self.px_samples_scale
                 write_color(sys.stdout, pixel_color)
 

@@ -2,9 +2,10 @@ from interval import Interval
 from vec3 import Vec3
 
 def write_color(out, pixel_color):
-    r = pixel_color.x()
-    g = pixel_color.y()
-    b = pixel_color.z()
+    gamma_corrected = pixel_color.to_gamma()
+    r = gamma_corrected.x()
+    g = gamma_corrected.y()
+    b = gamma_corrected.z()
 
     intensity = Interval(0.0, 0.999)
     rbyte = int(256 * intensity.clamp(r))
