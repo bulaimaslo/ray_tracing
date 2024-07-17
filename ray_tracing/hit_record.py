@@ -4,6 +4,7 @@ class HitRecord:
     def __init__(self):
         self.p = None
         self.normal = None
+        self.mat = None
         self.t = 0
         self.front_face = False
 

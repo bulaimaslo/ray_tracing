@@ -2,7 +2,8 @@ import random
 import math
 
 class Vec3:
-    def __init__(self, e0=0, e1=0, e2=0):
+    # support float and int
+    def __init__(self, e0, e1, e2):
         self.e = [e0, e1, e2]
 
     def x(self):
@@ -28,8 +29,9 @@ class Vec3:
 
     def __mul__(self, t):
         if isinstance(t, Vec3):
-            return Vec3(self.e[0] * t.x(), self.e[1] * t.y(), self.e[2] * t.z())
-        return Vec3(self.e[0] * t, self.e[1] * t, self.e[2] * t)
+            return Vec3(self.x() * t.x(), self.y() * t.y(), self.z() * t.z())
+        else:
+            return Vec3(self.x() * t, self.y() * t, self.z() * t)
     
     def __rmul__(self, t):
         return self * t
@@ -46,6 +48,13 @@ class Vec3:
 
     def unit_vector(self):
         return self / self.length()
+
+    def near_zero(self):
+        s = 1e-8
+        return (abs(self.x()) < s) and (abs(self.y()) < s) and (abs(self.z()) < s)
+
+    def reflect(self, n):
+        return self - 2 * dot(self, n) * n
     
     @staticmethod
     def random(min=0.0, max=1.0):
@@ -78,3 +87,10 @@ def unit_vector(v):
 
 def clamp(x, min_val, max_val):
     return max(min_val, min(x, max_val))
+
+def random_unit_vector():
+    a = random.uniform(0, 2 * math.pi)
+    z = random.uniform(-1, 1)
+    r = math.sqrt(1 - z ** 2)
+    return Vec3(r * math.cos(a), r * math.sin(a), z)
+
